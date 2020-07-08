@@ -1,0 +1,159 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     4.1                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      fvSolution;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+solvers
+{
+
+    p
+    {
+        solver           PCG;
+        preconditioner   DIC;
+
+        tolerance        1e-07;
+        relTol           0;
+        minIter          0;
+        maxIter          800;
+    }
+
+    U
+    {
+
+        solver           PBiCGStab;
+        preconditioner   DILU;
+
+        tolerance        1e-6;
+        relTol           0;
+        minIter          0;
+        maxIter          1000;
+    }
+
+    Sfirst
+    {
+        solver           PBiCGStab;
+        preconditioner   DILU;
+
+        tolerance        1e-6;
+        relTol           0;
+        minIter          0;
+        maxIter          1000;
+    }
+
+    Ssecond
+    {
+        solver           PBiCGStab;
+        preconditioner   DILU;
+
+        tolerance        1e-6;
+        relTol           0;
+        minIter          0;
+        maxIter          1000;
+    }
+
+    Sthird
+    {
+        solver           PBiCGStab;
+        preconditioner   DILU;
+
+        tolerance        1e-6;
+        relTol           0;
+        minIter          0;
+        maxIter          1000;
+    }
+
+    Sfourth
+    {
+        solver           PBiCGStab;
+        preconditioner   DILU;
+
+        tolerance        1e-6;
+        relTol           0;
+        minIter          0;
+        maxIter          1000;
+    }
+
+    Lambdafirst
+    {
+        solver           PBiCGStab;
+        preconditioner   DILU;
+
+        tolerance        1e-6;
+        relTol           0;
+        minIter          0;
+        maxIter          1000;
+    }
+
+    Lambdasecond
+    {
+        solver           PBiCGStab;
+        preconditioner   DILU;
+
+        tolerance        1e-6;
+        relTol           0;
+        minIter          0;
+        maxIter          1000;;
+    }
+
+    Lambdathird
+    {
+        solver           PBiCGStab;
+        preconditioner   DILU;
+
+        tolerance        1e-6;
+        relTol           0;
+        minIter          0;
+        maxIter          1000;
+    }
+
+    Lambdafourth
+    {
+        solver           PBiCGStab;
+        preconditioner   DILU;
+
+        tolerance        1e-6;
+        relTol           0;
+        minIter          0;
+        maxIter          1000;
+    }
+
+}
+
+PISO
+{
+    nCorrectors    2;
+    nNonOrthogonalCorrectors 0;
+    pRefCell        0;
+    pRefValue       0;
+}
+
+relaxationFactors
+{
+    p                   0.3;
+
+    U                   0.5;
+
+    Sfirst              0.3;
+    Ssecond             0.3;
+    Sthird              0.3;
+    Sfourth             0.3;
+
+    Lambdafirst         0.3;
+    Lambdasecond        0.3;
+    Lambdathird         0.3;
+    Lambdafourth        0.3;
+}
+
+
+// ************************************************************************* //
