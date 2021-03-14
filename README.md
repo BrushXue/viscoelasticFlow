@@ -1,7 +1,9 @@
 # viscoelasticFlow
-Porting the viscoelastic solver from foam-extend-4.1 to OpenFOAM-v1912.
+Porting the viscoelastic solver from foam-extend-4.1 to OpenFOAM-v2012.
 
-Out-dated code and deprecated features are replaced with the latest standard.
+Out-dated code and deprecated features are replaced with new methods.
+
+Eigen v3.3.9 is included in the source code.
 
 ## Instructions:
 1. Download the source code, (not neccesary to save in OpenFOAM folder).

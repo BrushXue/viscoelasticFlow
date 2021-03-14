@@ -27,8 +27,7 @@ boundaryField
     }
     fixedWalls
     {
-        type            fixedValue;
-        value           uniform (0 0 0);
+        type            noSlip;
     }
     outlet
     {
@@ -38,7 +37,7 @@ boundaryField
     {
         type            symmetryPlane;
     }
-    frontAndBack
+    frontandBack
     {
         type            empty;
     }

@@ -22,22 +22,24 @@ boundaryField
 {
     inlet
     {
-        type            fixedValue;
+        type            zeroGradient;
         value           uniform (0 0 0 0 0 0);
     }
     fixedWalls
     {
         type            zeroGradient;
+        value           uniform (0 0 0 0 0 0);
     }
     outlet
     {
         type            zeroGradient;
+        value           uniform (0 0 0 0 0 0);
     }
     simetry
     {
         type            symmetryPlane;
     }
-    frontAndBack
+    frontandBack
     {
         type            empty;
     }

@@ -13,3 +13,5 @@
 (cd WhiteMetzner/CarreauYasuda; ./Allclean)
 (cd XPP_DE;                     ./Allclean)
 (cd XPP_SE;                     ./Allclean)
+(cd Oldroyd-B-LCR;              ./Allclean)
+(cd Giesekus-LCR;               ./Allclean)

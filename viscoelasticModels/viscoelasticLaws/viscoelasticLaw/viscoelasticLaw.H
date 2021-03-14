@@ -71,6 +71,20 @@ protected:
     const volVectorField& U_;
     const surfaceScalarField& phi_;
     
+    void decompose
+    (
+        const volTensorField& M,
+        const volSymmTensorField& E, 
+        const volTensorField& R,
+        volSymmTensorField& S
+    );
+
+    void eigen
+    (
+        const volSymmTensorField& Psi_,
+        volSymmTensorField& E,
+        volTensorField& R
+    );
     
     // Private Member Functions
     

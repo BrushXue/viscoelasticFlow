@@ -94,7 +94,7 @@ boundary
             (1 8 18 11)
         );
     }
-    frontAndBack
+    frontandBack
     {
         type empty;
         faces

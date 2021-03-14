@@ -10,7 +10,6 @@ echo "Running blockMesh application"
 runApplication blockMesh
 
 runApplication decomposePar
-
 echo "Running viscoelasticFluidFoam solver"
 echo "Oldroyd-B model:"
 runParallel $application
