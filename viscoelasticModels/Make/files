@@ -21,7 +21,6 @@ viscoelasticLaws/WhiteMetzner/WhiteMetznerCross/WhiteMetznerCross.C
 viscoelasticLaws/WhiteMetzner/WhiteMetznerLarson/WhiteMetznerLarson.C
 viscoelasticLaws/XPP_SE/XPP_SE.C
 viscoelasticLaws/XPP_DE/XPP_DE.C
-viscoelasticLaws/iBSD/iBSD.C
 viscoelasticLaws/Oldroyd_B_LCR/Oldroyd_B_LCR.C
 viscoelasticLaws/Giesekus_LCR/Giesekus_LCR.C
 
