@@ -63,7 +63,6 @@ class UCM
         //- Transported viscoelastic stress
         volSymmTensorField tau_;
 
-
         // Model constants
 
         //- Density

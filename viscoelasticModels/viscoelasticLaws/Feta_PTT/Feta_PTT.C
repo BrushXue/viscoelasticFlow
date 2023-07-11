@@ -89,7 +89,7 @@ Foam::viscoelasticLaws::Feta_PTT::Feta_PTT
         ),
         etaP_/
         (
-            Foam::pow(scalar(1) + A_*Foam::pow(0.5*( Foam::sqr(tr(tau_))
+            Foam::pow(scalar(1.0) + A_*Foam::pow(0.5*(Foam::sqr(tr(tau_))
           - tr(tau_ & tau_))*Foam::sqr(lambda_)/Foam::sqr(etaP_), a_), b_)
         )
     ),
@@ -113,14 +113,11 @@ Foam::viscoelasticLaws::Feta_PTT::Feta_PTT
 
 Foam::tmp<Foam::fvVectorMatrix> Foam::viscoelasticLaws::Feta_PTT::divTau(volVectorField& U) const
 {
-    // Need to be equal to old time step (a constant)
-    dimensionedScalar etaPEff = etaP_;
-
     return
     (
-        fvc::div(tau_/rho_, "div(tau)")
-      - fvc::laplacian(etaPEff/rho_, U, "laplacian(etaPEff,U)")
-      + fvm::laplacian( (etaPEff + etaS_)/rho_, U, "laplacian(etaPEff+etaS,U)")
+        fvc::div(tau_ / rho_, "div(tau)")
+      - fvc::div(etaP_ / rho_ * fvc::grad(U), "div(grad(U))")
+      + fvm::laplacian((etaP_ + etaS_) / rho_, U, "laplacian(eta,U)")
     );
 }
 
@@ -139,7 +136,7 @@ void Foam::viscoelasticLaws::Feta_PTT::correct()
     // etaP effective
     etaPEff_ = etaP_/
         (
-            Foam::pow(scalar(1) + A_*Foam::pow(0.5*( Foam::sqr(tr(tau_))
+            Foam::pow(scalar(1.0) + A_*Foam::pow(0.5*( Foam::sqr(tr(tau_))
           - tr(tau_ & tau_)) * Foam::sqr(lambda_)/Foam::sqr(etaP_), a_), b_)
         );
 

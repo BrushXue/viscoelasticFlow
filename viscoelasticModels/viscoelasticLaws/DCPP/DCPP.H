@@ -70,9 +70,6 @@ class DCPP
         //- Transported viscoelastic stress
         volSymmTensorField tau_;
 
-        //- Identity tensor
-        dimensionedSymmTensor I_;
-
         // Model constants
 
         //- Density

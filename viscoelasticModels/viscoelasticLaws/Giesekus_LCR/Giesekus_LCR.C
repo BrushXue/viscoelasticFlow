@@ -138,7 +138,7 @@ Foam::tmp<Foam::fvVectorMatrix> Foam::viscoelasticLaws::Giesekus_LCR::divTau(vol
     (
         fvc::div(tau_ / rho_, "div(tau)")
       - fvc::div(etaP_ / rho_ * fvc::grad(U), "div(grad(U))")
-      + fvm::laplacian( (etaP_ + etaS_)/rho_, U, "laplacian(eta,U)")
+      + fvm::laplacian((etaP_ + etaS_) / rho_, U, "laplacian(eta,U)")
     );
 }
 
@@ -156,18 +156,16 @@ void Foam::viscoelasticLaws::Giesekus_LCR::correct()
     decompose(M, E, R, S);
     
     // Calculate F
-    volSymmTensorField ER(symm(R & E & R.T()));
-    volSymmTensorField invER(symm(R & inv(E) & R.T()));
-    volSymmTensorField F(((2*alpha_-1)*symmTensor::I + (1-alpha_)*invER - alpha_*ER) / lambda_);
+    volSymmTensorField F(((2.0 * alpha_- 1.0) * symmTensor::I + (1.0 - alpha_) * symm(R & inv(E) & R.T()) - alpha_ * symm(R & E & R.T())) / lambda_);
 
     // Solve Psi
     fvSymmTensorMatrix PsiEqn
     (
         fvm::ddt(Psi)
-     + fvm::div(phi(), Psi)
+      + fvm::div(phi(), Psi)
      ==
         symm(R & S & R.T())
-        + F
+      + F
     );
     PsiEqn.relax();
     PsiEqn.solve();

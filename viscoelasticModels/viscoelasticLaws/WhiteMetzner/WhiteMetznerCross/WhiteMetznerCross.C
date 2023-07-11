@@ -82,16 +82,12 @@ Foam::viscoelasticLaws::WhiteMetznerCross::WhiteMetznerCross
 
 Foam::tmp<Foam::fvVectorMatrix> Foam::viscoelasticLaws::WhiteMetznerCross::divTau(volVectorField& U) const
 {
-    // Need to be equal to old time step (a constant)
-    dimensionedScalar etaPEff = etaP_;
-
     return
     (
-        fvc::div(tau_/rho_, "div(tau)")
-      - fvc::laplacian(etaPEff/rho_, U, "laplacian(etaPEff,U)")
-      + fvm::laplacian( (etaPEff + etaS_)/rho_, U, "laplacian(etaPEff+etaS,U)")
+        fvc::div(tau_ / rho_, "div(tau)")
+      - fvc::div(etaP_ / rho_ * fvc::grad(U), "div(grad(U))")
+      + fvm::laplacian((etaP_ + etaS_) / rho_, U, "laplacian(eta,U)")
     );
-
 }
 
 
@@ -107,9 +103,9 @@ void Foam::viscoelasticLaws::WhiteMetznerCross::correct()
     volSymmTensorField twoD(twoSymm(L));
 
     // Effective viscosity and relaxation time
-    volScalarField etaPValue(etaP_/(1 + Foam::pow(K_* sqrt(2.0)*mag(symm(L)), (1 - m_))));
+    volScalarField etaPValue(etaP_/(1.0 + Foam::pow(K_* sqrt(2.0)*mag(symm(L)), (1.0 - m_))));
 
-    volScalarField lambdaValue(lambda_/(1 + Foam::pow(L_ * sqrt(2.0)*mag(symm(L)), (1 - n_))));
+    volScalarField lambdaValue(lambda_/(1.0 + Foam::pow(L_ * sqrt(2.0)*mag(symm(L)), (1.0 - n_))));
 
     // Stress transport equation
     fvSymmTensorMatrix tauEqn
@@ -119,7 +115,7 @@ void Foam::viscoelasticLaws::WhiteMetznerCross::correct()
      ==
         etaPValue/lambdaValue*twoD
       + twoSymm(C)
-      - fvm::Sp(1/lambdaValue, tau_)
+      - fvm::Sp(1.0/lambdaValue, tau_)
     );
 
     tauEqn.relax();

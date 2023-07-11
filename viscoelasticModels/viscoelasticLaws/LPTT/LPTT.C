@@ -82,13 +82,11 @@ Foam::viscoelasticLaws::LPTT::LPTT
 
 Foam::tmp<Foam::fvVectorMatrix> Foam::viscoelasticLaws::LPTT::divTau(volVectorField& U) const
 {
-    dimensionedScalar etaPEff = etaP_;
-
     return
     (
-        fvc::div(tau_/rho_, "div(tau)")
-      - fvc::laplacian(etaPEff/rho_, U, "laplacian(etaPEff,U)")
-      + fvm::laplacian( (etaPEff + etaS_)/rho_, U, "laplacian(etaPEff+etaS,U)")
+        fvc::div(tau_ / rho_, "div(tau)")
+      - fvc::div(etaP_ / rho_ * fvc::grad(U), "div(grad(U))")
+      + fvm::laplacian((etaP_ + etaS_) / rho_, U, "laplacian(eta,U)")
     );
 }
 

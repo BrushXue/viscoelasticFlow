@@ -48,7 +48,7 @@ namespace viscoelasticLaws
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class Giesekus Declaration
+                           Class Giesekus_LCR Declaration
 \*---------------------------------------------------------------------------*/
 
 class Giesekus_LCR

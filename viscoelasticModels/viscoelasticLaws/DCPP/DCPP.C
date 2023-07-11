@@ -100,21 +100,6 @@ Foam::viscoelasticLaws::DCPP::DCPP
         )
     ),
 
-    I_
-    (
-        dimensionedSymmTensor
-        (
-            "I",
-            dimless,
-            symmTensor
-            (
-                1, 0, 0,
-                   1, 0,
-                      1
-            )
-        )
-    ),
-
     rho_("rho", dimDensity, DCPPCoeffs_),
     etaS_("etaS", dimDynamicViscosity, DCPPCoeffs_),
     etaP_("etaP", dimDynamicViscosity, DCPPCoeffs_),
@@ -129,13 +114,11 @@ Foam::viscoelasticLaws::DCPP::DCPP
 
 Foam::tmp<Foam::fvVectorMatrix> Foam::viscoelasticLaws::DCPP::divTau(volVectorField& U) const
 {
-    dimensionedScalar etaPEff = etaP_;
-
     return
     (
-        fvc::div(tau_/rho_, "div(tau)")
-      - fvc::laplacian(etaPEff/rho_, U, "laplacian(etaPEff,U)")
-      + fvm::laplacian((etaPEff + etaS_)/rho_, U, "laplacian(etaPEff+etaS,U)")
+        fvc::div(tau_ / rho_, "div(tau)")
+      - fvc::div(etaP_ / rho_ * fvc::grad(U), "div(grad(U))")
+      + fvm::laplacian((etaP_ + etaS_) / rho_, U, "laplacian(eta,U)")
     );
 }
 
@@ -164,7 +147,7 @@ void Foam::viscoelasticLaws::DCPP::correct()
       - (zeta_/2)*twoSymm(Clower)
       - (1 - zeta_)*fvm::Sp((twoD && S_), S_)
       - fvm::Sp(1/lambdaOb_/Foam::sqr(Lambda_), S_)
-      + 1/lambdaOb_/Foam::sqr(Lambda_)/3*I_
+      + 1/lambdaOb_/Foam::sqr(Lambda_)/3*symmTensor::I
     );
 
     SEqn.relax();
@@ -176,16 +159,16 @@ void Foam::viscoelasticLaws::DCPP::correct()
         fvm::ddt(Lambda_)
       + fvm::div(phi(), Lambda_)
      ==
-        fvm::Sp((twoD && S_)/2 , Lambda_)
-      - fvm::Sp(Foam::exp(2/q_*(Lambda_ - 1))/lambdaOs_ , Lambda_)
-      + Foam::exp( 2/q_*(Lambda_ - 1))/lambdaOs_
+        fvm::Sp((twoD && S_)/2.0 , Lambda_)
+      - fvm::Sp(Foam::exp(2.0/q_*(Lambda_ - 1.0))/lambdaOs_ , Lambda_)
+      + Foam::exp( 2.0/q_*(Lambda_ - 1.0))/lambdaOs_
     );
 
     lambdaEqn.relax();
     lambdaEqn.solve();
 
     // Viscoelastic stress
-    tau_ = etaP_/lambdaOb_/(1 - zeta_) * (3*Foam::sqr(Lambda_)*S_ - I_);
+    tau_ = etaP_/lambdaOb_/(1.0 - zeta_) * (3.0*Foam::sqr(Lambda_)*S_ - symmTensor::I);
 }
 
 

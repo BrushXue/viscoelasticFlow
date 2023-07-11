@@ -78,14 +78,11 @@ Foam::viscoelasticLaws::WhiteMetznerLarson::WhiteMetznerLarson
 
 Foam::tmp<Foam::fvVectorMatrix> Foam::viscoelasticLaws::WhiteMetznerLarson::divTau(volVectorField& U) const
 {
-    // Meed to be equal to old time step (a constant)
-    dimensionedScalar etaPEff = etaP_;
-
     return
     (
-        fvc::div(tau_/rho_, "div(tau)")
-      - fvc::laplacian(etaPEff/rho_, U, "laplacian(etaPEff,U)")
-      + fvm::laplacian( (etaPEff + etaS_)/rho_, U, "laplacian(etaPEff+etaS,U)")
+        fvc::div(tau_ / rho_, "div(tau)")
+      - fvc::div(etaP_ / rho_ * fvc::grad(U), "div(grad(U))")
+      + fvm::laplacian((etaP_ + etaS_) / rho_, U, "laplacian(eta,U)")
     );
 }
 
@@ -109,7 +106,7 @@ void Foam::viscoelasticLaws::WhiteMetznerLarson::correct()
      ==
         etaP_/lambda_*twoD
       + twoSymm(C)
-      - fvm::Sp((1 + a_*lambda_* sqrt(2.0)*mag(symm(L)) )/lambda_, tau_)
+      - fvm::Sp((1.0 + a_*lambda_* sqrt(2.0)*mag(symm(L)) )/lambda_, tau_)
     );
 
     tauEqn.relax();

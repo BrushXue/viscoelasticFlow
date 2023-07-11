@@ -54,6 +54,7 @@ Foam::viscoelasticLaws::S_MDCPP::S_MDCPP
     (
         dict.optionalSubDict(typeName + "Coeffs")
      ),
+     
     tau_
     (
         IOobject
@@ -66,20 +67,7 @@ Foam::viscoelasticLaws::S_MDCPP::S_MDCPP
         ),
         U.mesh()
     ),
-    I_
-    (
-        dimensionedSymmTensor
-        (
-            "I",
-            dimless,
-            symmTensor
-            (
-                1, 0, 0,
-                   1, 0,
-                      1
-            )
-        )
-    ),
+
     rho_("rho", dimDensity, S_MDCPPCoeffs_),
     etaS_("etaS", dimDynamicViscosity, S_MDCPPCoeffs_),
     etaP_("etaP", dimDynamicViscosity, S_MDCPPCoeffs_),
@@ -94,15 +82,12 @@ Foam::viscoelasticLaws::S_MDCPP::S_MDCPP
 
 Foam::tmp<Foam::fvVectorMatrix> Foam::viscoelasticLaws::S_MDCPP::divTau(volVectorField& U) const
 {
-    dimensionedScalar etaPEff = etaP_;
-
     return
     (
-        fvc::div(tau_/rho_, "div(tau)")
-      - fvc::laplacian(etaPEff/rho_, U, "laplacian(etaPEff,U)")
-      + fvm::laplacian( (etaPEff + etaS_)/rho_, U, "laplacian(etaPEff+etaS,U)")
+        fvc::div(tau_ / rho_, "div(tau)")
+      - fvc::div(etaP_ / rho_ * fvc::grad(U), "div(grad(U))")
+      + fvm::laplacian((etaP_ + etaS_) / rho_, U, "laplacian(eta,U)")
     );
-
 }
 
 
@@ -135,9 +120,9 @@ void Foam::viscoelasticLaws::S_MDCPP::correct()
         etaP_/lambdaOb_*twoD
       + twoSymm(C)
       - zeta_*symm(tau_ & twoD)
-      - fvm::Sp(1/lambdaOb_*fTau, tau_)
+      - fvm::Sp(1.0/lambdaOb_*fTau, tau_)
       - (
-            1/lambdaOb_*(etaP_/lambdaOb_/(1 - zeta_)*(fTau - aux)*I_)
+            1.0/lambdaOb_*(etaP_/lambdaOb_/(1.0 - zeta_)*(fTau - aux)*symmTensor::I)
         )
     );
 

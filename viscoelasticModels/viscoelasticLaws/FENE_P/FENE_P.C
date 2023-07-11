@@ -81,15 +81,12 @@ Foam::viscoelasticLaws::FENE_P::FENE_P
 
 Foam::tmp<Foam::fvVectorMatrix> Foam::viscoelasticLaws::FENE_P::divTau(volVectorField& U) const
 {
-    dimensionedScalar etaPEff = etaP_;
-
     return
     (
-        fvc::div(tau_/rho_, "div(tau)")
-      - fvc::laplacian(etaPEff/rho_, U, "laplacian(etaPEff,U)")
-      + fvm::laplacian( (etaPEff + etaS_)/rho_, U, "laplacian(etaPEff+etaS,U)")
+        fvc::div(tau_ / rho_, "div(tau)")
+      - fvc::div(etaP_ / rho_ * fvc::grad(U), "div(grad(U))")
+      + fvm::laplacian((etaP_ + etaS_) / rho_, U, "laplacian(eta,U)")
     );
-
 }
 
 
@@ -110,11 +107,11 @@ void Foam::viscoelasticLaws::FENE_P::correct()
         fvm::ddt(tau_)
       + fvm::div(phi(), tau_)
      ==
-        (1/lambda_/(1 - 3/L2_))*etaP_*twoD
+        (1.0/lambda_/(1.0 - 3.0/L2_))*etaP_*twoD
       + twoSymm(C)
       - fvm::Sp
         (
-            1/lambda_ + (3/lambda_/(1 - 3/L2_) + tr(tau_)/etaP_)/(L2_),
+            1.0/lambda_ + (3.0/lambda_/(1.0 - 3.0/L2_) + tr(tau_)/etaP_)/(L2_),
             tau_
         )
     );

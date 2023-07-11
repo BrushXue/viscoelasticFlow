@@ -66,20 +66,7 @@ Foam::viscoelasticLaws::XPP_SE::XPP_SE
         ),
         U.mesh()
     ),
-    I_
-    (
-        dimensionedSymmTensor
-        (
-            "I",
-            dimless,
-            symmTensor
-            (
-                1, 0, 0,
-                   1, 0,
-                      1
-            )
-        )
-    ),
+
     rho_("rho", dimDensity, XPP_SECoeffs_),
     etaS_("etaS", dimDynamicViscosity, XPP_SECoeffs_),
     etaP_("etaP", dimDynamicViscosity, XPP_SECoeffs_),
@@ -94,16 +81,12 @@ Foam::viscoelasticLaws::XPP_SE::XPP_SE
 
 Foam::tmp<Foam::fvVectorMatrix> Foam::viscoelasticLaws::XPP_SE::divTau(volVectorField& U) const
 {
-
-    dimensionedScalar etaPEff = etaP_;
-
     return
     (
-        fvc::div(tau_/rho_, "div(tau)")
-      - fvc::laplacian(etaPEff/rho_, U, "laplacian(etaPEff,U)")
-      + fvm::laplacian( (etaPEff + etaS_)/rho_, U, "laplacian(etaPEff+etaS,U)")
+        fvc::div(tau_ / rho_, "div(tau)")
+      - fvc::div(etaP_ / rho_ * fvc::grad(U), "div(grad(U))")
+      + fvm::laplacian((etaP_ + etaS_) / rho_, U, "laplacian(eta,U)")
     );
-
 }
 
 
@@ -119,15 +102,15 @@ void Foam::viscoelasticLaws::XPP_SE::correct()
     volSymmTensorField twoD(twoSymm(L));
 
     // Lambda (Backbone stretch)
-    volScalarField Lambda(Foam::sqrt(1 + tr(tau_)*lambdaOb_/3/etaP_));
+    volScalarField Lambda(Foam::sqrt(1.0 + tr(tau_)*lambdaOb_/3.0/etaP_));
 
     // lambdaS (stretch relaxation time)
-    volScalarField lambdaS(lambdaOs_*Foam::exp(-2/q_*(Lambda - 1)));
+    volScalarField lambdaS(lambdaOs_*Foam::exp(-2.0/q_*(Lambda - 1.0)));
 
     // Extra function
-    volScalarField fTau(2*lambdaOb_/lambdaS*(1 - 1/Lambda)
-      + 1/Foam::sqr(Lambda)*
-        (1 - alpha_*tr(tau_ & tau_)/3/Foam::sqr(etaP_/lambdaOb_)));
+    volScalarField fTau(2.0*lambdaOb_/lambdaS*(1.0 - 1.0/Lambda)
+      + 1.0/Foam::sqr(Lambda)*
+        (1.0 - alpha_*tr(tau_ & tau_)/3.0/Foam::sqr(etaP_/lambdaOb_)));
 
      // Stress transport equation
     fvSymmTensorMatrix tauEqn
@@ -137,12 +120,12 @@ void Foam::viscoelasticLaws::XPP_SE::correct()
      ==
         etaP_/lambdaOb_*twoD
       + twoSymm(C)
-      - fvm::Sp(1/lambdaOb_*fTau, tau_)
+      - fvm::Sp(1.0/lambdaOb_*fTau, tau_)
       - (
-            1/lambdaOb_*
+            1.0/lambdaOb_*
             (
                 alpha_*lambdaOb_/etaP_*symm(tau_ & tau_)
-              + etaP_/lambdaOb_*(fTau - 1)*I_
+              + etaP_/lambdaOb_*(fTau - 1.0)*symmTensor::I
             )
         )
     );

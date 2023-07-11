@@ -91,22 +91,20 @@ Foam::tmp<Foam::fvVectorMatrix> Foam::viscoelasticLaws::UCM::divTau(volVectorFie
 {
     if(etaStab_.value() < SMALL)
     {
-        dimensionedScalar etaPEff = etaP_;
-
         return
         (
-            fvc::div(tau_/rho_, "div(tau)")
-          - fvc::laplacian(etaPEff/rho_, U, "laplacian(etaPEff,U)")
-          + fvm::laplacian( (etaPEff)/rho_, U, "laplacian(etaPEff+etaS,U)")
+            fvc::div(tau_ / rho_, "div(tau)")
+          - fvc::div(etaP_ / rho_ * fvc::grad(U), "div(grad(U))")
+          + fvm::laplacian(etaP_ / rho_, U, "laplacian(eta,U)")
         );
     }
     else
     {
         return
         (
-            fvc::div(tau_/rho_, "div(tau)")
-          - fvc::div((etaStab_/rho_)*fvc::grad(U), "div(tau)")
-          + fvm::laplacian( (etaStab_)/rho_, U, "laplacian(etaPEff+etaS,U)")
+            fvc::div(tau_ / rho_, "div(tau)")
+          - fvc::div(etaStab_ / rho_ * fvc::grad(U), "div(grad(U))")
+          + fvm::laplacian(etaStab_ / rho_, U, "laplacian(eta,U)")
         );
     }
 }
@@ -131,7 +129,7 @@ void Foam::viscoelasticLaws::UCM::correct()
      ==
         etaP_/lambda_*twoD
       + twoSymm(C)
-      - fvm::Sp( 1/lambda_, tau_)
+      - fvm::Sp(1.0/lambda_, tau_)
     );
 
     tauEqn.relax();

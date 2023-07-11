@@ -66,6 +66,7 @@ Foam::viscoelasticLaws::Leonov::Leonov
         ),
         U.mesh()
     ),
+    
     tau_
     (
         IOobject
@@ -84,20 +85,7 @@ Foam::viscoelasticLaws::Leonov::Leonov
             symmTensor::zero
         )
     ),
-    I_
-    (
-        dimensionedSymmTensor
-        (
-            "I",
-            dimless,
-            symmTensor
-            (
-                1, 0, 0,
-                   1, 0,
-                      1
-            )
-        )
-    ),
+
     rho_("rho", dimDensity, LeonovCoeffs_),
     etaS_("etaS", dimDynamicViscosity, LeonovCoeffs_),
     etaP_("etaP", dimDynamicViscosity, LeonovCoeffs_),
@@ -109,13 +97,11 @@ Foam::viscoelasticLaws::Leonov::Leonov
 
 Foam::tmp<Foam::fvVectorMatrix> Foam::viscoelasticLaws::Leonov::divTau(volVectorField& U) const
 {
-    dimensionedScalar etaPEff = etaP_;
-
     return
     (
-        fvc::div(tau_/rho_, "div(tau)")
-      - fvc::laplacian(etaPEff/rho_, U, "laplacian(etaPEff,U)")
-      + fvm::laplacian( (etaPEff + etaS_)/rho_, U, "laplacian(etaPEff+etaS,U)")
+        fvc::div(tau_ / rho_, "div(tau)")
+      - fvc::div(etaP_ / rho_ * fvc::grad(U), "div(grad(U))")
+      + fvm::laplacian((etaP_ + etaS_) / rho_, U, "laplacian(eta,U)")
     );
 }
 
@@ -138,10 +124,10 @@ void Foam::viscoelasticLaws::Leonov::correct()
       + fvm::div(phi(), sigma_)
      ==
         twoSymm(C)
-      - 1/etaP_/2*(symm(sigma_ & sigma_) - Foam::pow((etaP_/lambda_), 2)*I_)
+      - 1.0/etaP_/2.0*(symm(sigma_ & sigma_) - Foam::pow((etaP_/lambda_), 2)*symmTensor::I)
       + fvm::Sp
         (
-            1/etaP_/6*
+            1.0/etaP_/6.0*
             (
                 tr(sigma_)
               - Foam::pow(etaP_/lambda_,2) * tr(inv(sigma_))
@@ -154,7 +140,7 @@ void Foam::viscoelasticLaws::Leonov::correct()
     sigmaEqn.solve();
 
     // Viscoelastic stress
-    tau_ = sigma_ - etaP_/lambda_*I_;
+    tau_ = sigma_ - etaP_/lambda_*symmTensor::I;
 }
 
 

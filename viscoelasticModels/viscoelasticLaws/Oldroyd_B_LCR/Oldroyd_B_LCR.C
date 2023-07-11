@@ -138,7 +138,7 @@ Foam::tmp<Foam::fvVectorMatrix> Foam::viscoelasticLaws::Oldroyd_B_LCR::divTau(vo
     (
         fvc::div(tau_ / rho_, "div(tau)")
       - fvc::div(etaP_ / rho_ * fvc::grad(U), "div(grad(U))")
-      + fvm::laplacian( (etaP_ + etaS_)/rho_, U, "laplacian(eta,U)")
+      + fvm::laplacian((etaP_ + etaS_) / rho_, U, "laplacian(eta,U)")
     );
 }
 
@@ -162,7 +162,7 @@ void Foam::viscoelasticLaws::Oldroyd_B_LCR::correct()
     fvSymmTensorMatrix PsiEqn
     (
         fvm::ddt(Psi)
-     + fvm::div(phi(), Psi)
+      + fvm::div(phi(), Psi)
      ==
         symm(R & (S + F) & R.T())
     );

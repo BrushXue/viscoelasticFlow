@@ -85,7 +85,7 @@ Foam::tmp<Foam::fvVectorMatrix> Foam::viscoelasticLaws::Giesekus::divTau(volVect
     (
         fvc::div(tau_ / rho_, "div(tau)")
       - fvc::div(etaP_ / rho_ * fvc::grad(U), "div(grad(U))")
-      + fvm::laplacian( (etaP_ + etaS_)/rho_, U, "laplacian(eta,U)")
+      + fvm::laplacian((etaP_ + etaS_) / rho_, U, "laplacian(eta,U)")
     );
 }
 
@@ -110,7 +110,7 @@ void Foam::viscoelasticLaws::Giesekus::correct()
         etaP_/lambda_*twoD
       + twoSymm(C)
       - (alpha_/etaP_)*symm(tau_ & tau_)
-      - fvm::Sp(1/lambda_, tau_)
+      - fvm::Sp(1.0/lambda_, tau_)
     );
 
     tauEqn.relax();

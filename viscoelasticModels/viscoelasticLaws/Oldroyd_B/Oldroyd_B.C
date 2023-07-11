@@ -84,7 +84,7 @@ Foam::tmp<Foam::fvVectorMatrix> Foam::viscoelasticLaws::Oldroyd_B::divTau(volVec
     (
         fvc::div(tau_ / rho_, "div(tau)")
       - fvc::div(etaP_ / rho_ * fvc::grad(U), "div(grad(U))")
-      + fvm::laplacian( (etaP_ + etaS_)/rho_, U, "laplacian(eta,U)")
+      + fvm::laplacian((etaP_ + etaS_) / rho_, U, "laplacian(eta,U)")
     );
 }
 
@@ -108,7 +108,7 @@ void Foam::viscoelasticLaws::Oldroyd_B::correct()
      ==
         etaP_/lambda_*twoD
       + twoSymm(C)
-      - fvm::Sp(1/lambda_, tau_)
+      - fvm::Sp(1.0/lambda_, tau_)
     );
 
     tauEqn.relax();

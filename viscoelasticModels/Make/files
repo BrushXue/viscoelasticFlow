@@ -23,5 +23,9 @@ viscoelasticLaws/XPP_SE/XPP_SE.C
 viscoelasticLaws/XPP_DE/XPP_DE.C
 viscoelasticLaws/Oldroyd_B_LCR/Oldroyd_B_LCR.C
 viscoelasticLaws/Giesekus_LCR/Giesekus_LCR.C
+viscoelasticLaws/EPTT_LCR/EPTT_LCR.C
+viscoelasticLaws/LPTT_LCR/LPTT_LCR.C
+viscoelasticLaws/FENE_CR_LCR/FENE_CR_LCR.C
+viscoelasticLaws/FENE_P_LCR/FENE_P_LCR.C
 
 LIB = $(FOAM_USER_LIBBIN)/libviscoelasticModels

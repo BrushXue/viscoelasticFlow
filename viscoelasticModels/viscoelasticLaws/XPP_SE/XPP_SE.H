@@ -63,9 +63,6 @@ class XPP_SE
         //- Transported viscoelastic stress
         volSymmTensorField tau_;
 
-        //- Identity tensor
-        dimensionedSymmTensor I_;
-
         // Model constants
 
         //- Density

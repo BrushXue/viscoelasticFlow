@@ -65,6 +65,7 @@ Foam::viscoelasticLaws::XPP_DE::XPP_DE
         ),
         U.mesh()
     ),
+    
     Lambda_
     (
         IOobject
@@ -77,6 +78,7 @@ Foam::viscoelasticLaws::XPP_DE::XPP_DE
         ),
         U.mesh()
     ),
+    
     tau_
     (
         IOobject
@@ -95,20 +97,7 @@ Foam::viscoelasticLaws::XPP_DE::XPP_DE
             symmTensor::zero
         )
     ),
-    I_
-    (
-        dimensionedSymmTensor
-        (
-            "I",
-            dimless,
-            symmTensor
-            (
-                1, 0, 0,
-                   1, 0,
-                      1
-            )
-        )
-    ),
+
     rho_("rho", dimDensity, XPP_DECoeffs_),
     etaS_("etaS", dimDynamicViscosity, XPP_DECoeffs_),
     etaP_("etaP", dimDynamicViscosity, XPP_DECoeffs_),
@@ -123,15 +112,12 @@ Foam::viscoelasticLaws::XPP_DE::XPP_DE
 
 Foam::tmp<Foam::fvVectorMatrix> Foam::viscoelasticLaws::XPP_DE::divTau(volVectorField& U) const
 {
-    dimensionedScalar etaPEff = etaP_;
-
     return
     (
-        fvc::div(tau_/rho_, "div(tau)")
-      - fvc::laplacian(etaPEff/rho_, U, "laplacian(etaPEff,U)")
-      + fvm::laplacian( (etaPEff + etaS_)/rho_, U, "laplacian(etaPEff+etaS,U)")
+        fvc::div(tau_ / rho_, "div(tau)")
+      - fvc::div(etaP_ / rho_ * fvc::grad(U), "div(grad(U))")
+      + fvm::laplacian((etaP_ + etaS_) / rho_, U, "laplacian(eta,U)")
     );
-
 }
 
 
@@ -156,12 +142,12 @@ void Foam::viscoelasticLaws::XPP_DE::correct()
       - fvm::Sp((twoD && S_) , S_)
       - fvm::Sp
         (
-            1/lambdaOb_/Foam::sqr(Lambda_)*
-            (1 - alpha_ - 3*alpha_*Foam::pow(Lambda_, 4)*tr(S_ & S_)),
+            1.0/lambdaOb_/Foam::sqr(Lambda_)*
+            (1.0 - alpha_ - 3.0*alpha_*Foam::pow(Lambda_, 4)*tr(S_ & S_)),
             S_
         )
-        - 1/lambdaOb_/Foam::sqr(Lambda_)*
-        (3*alpha_*Foam::pow(Lambda_, 4)*symm(S_ & S_) - (1 - alpha_)/3*I_)
+        - 1.0/lambdaOb_/Foam::sqr(Lambda_)*
+        (3.0*alpha_*Foam::pow(Lambda_, 4)*symm(S_ & S_) - (1.0 - alpha_)/3.0*symmTensor::I)
     );
 
     SEqn.relax();
@@ -174,16 +160,16 @@ void Foam::viscoelasticLaws::XPP_DE::correct()
         fvm::ddt(Lambda_)
       + fvm::div(phi(), Lambda_)
      ==
-        fvm::Sp((twoD && S_)/2 , Lambda_)
-      - fvm::Sp(Foam::exp( 2/q_*(Lambda_ - 1))/lambdaOs_ , Lambda_)
-      + Foam::exp(2/q_*(Lambda_ - 1))/lambdaOs_
+        fvm::Sp((twoD && S_)/2.0 , Lambda_)
+      - fvm::Sp(Foam::exp( 2.0/q_*(Lambda_ - 1.0))/lambdaOs_ , Lambda_)
+      + Foam::exp(2.0/q_*(Lambda_ - 1.0))/lambdaOs_
     );
 
     LambdaEqn.relax();
     LambdaEqn.solve();
 
     // Viscoelastic stress
-    tau_ = etaP_/lambdaOb_*(3*Foam::sqr(Lambda_)*S_ - I_);
+    tau_ = etaP_/lambdaOb_*(3.0*Foam::sqr(Lambda_)*S_ - symmTensor::I);
 }
 
 bool Foam::viscoelasticLaws::XPP_DE::read
