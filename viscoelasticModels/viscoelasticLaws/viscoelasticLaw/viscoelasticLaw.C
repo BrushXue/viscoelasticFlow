@@ -91,7 +91,7 @@ void viscoelasticLaw::eigen
     volTensorField& R
 )
 {
-     Eigen::Matrix3d A;
+    Eigen::Matrix3d A;
     Eigen::SelfAdjointEigenSolver<Eigen::Matrix3d> sol;
     // Update eigen (dimless)
     forAll(Psi, celli) {
@@ -106,10 +106,15 @@ void viscoelasticLaw::eigen
         Eigen::Vector3d val = sol.eigenvalues();
         Eigen::Matrix3d vec = sol.eigenvectors();
         symmTensor& tE = E[celli];
+        tE = symmTensor(exp(val(0)),0,0,exp(val(1)),0,exp(val(2)));
+        /*
         tE.xx() = exp(val(0));
         tE.yy() = exp(val(1));
         tE.zz() = exp(val(2));
+        */
         tensor& tR = R[celli];
+        tR = tensor(vec(0, 0), vec(0, 1), vec(0, 2), vec(1, 0), vec(01, 1), vec(1, 2), vec(2, 0), vec(2, 1), vec(2, 2));
+        /*
         tR.xx() = vec(0, 0);
         tR.xy() = vec(0, 1);
         tR.xz() = vec(0, 2);
@@ -119,6 +124,7 @@ void viscoelasticLaw::eigen
         tR.zx() = vec(2, 0);
         tR.zy() = vec(2, 1);
         tR.zz() = vec(2, 2);
+        */
     }
 }
 

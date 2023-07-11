@@ -1,1 +1,0 @@
-../viscoelasticLaws/WhiteMetzner/WhiteMetznerCarreauYasuda/WhiteMetznerCarreauYasuda.H

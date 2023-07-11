@@ -1,1 +1,0 @@
-../viscoelasticLaws/LPTT/LPTT.C
